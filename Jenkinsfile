@@ -38,8 +38,8 @@ pipeline {
                 withCredentials([file(credentialsId: 'gcp-svc', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                     script {
                         // Initialize and apply Terraform
-                        sh 'terraform init'
-                        sh 'terraform apply -auto-approve'
+                        powershell 'terraform init'
+                        powershell 'terraform apply -auto-approve'
                     }
                 }
             }
