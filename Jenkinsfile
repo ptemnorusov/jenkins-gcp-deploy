@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        PROJECT_ID = 'your-gcp-project-id'
+        PROJECT_ID = 'prefab-faculty-350219'
         REGION = 'us-central1'
     }
     triggers {
