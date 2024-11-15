@@ -52,7 +52,7 @@ pipeline {
             // Notify on success
             withCredentials([string(credentialsId: 'telegram-bot-token', variable: 'TELEGRAM_BOT_TOKEN')]) {
                 script {
-                    def message = "✅ Terraform Deployment Successful\nLoad Balancer URL: ${env.LOAD_BALANCER_URL}"
+                    def message = "✅ Terraform Deployment Successful\nDeployment ID: ${deploymentId}\nLoad Balancer URL: ${env.LOAD_BALANCER_URL}"
                     sh """
                     curl -s -X POST "https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage" \
                          -d chat_id=${env.TELEGRAM_CHAT_ID} \
@@ -66,7 +66,7 @@ pipeline {
             // Notify on failure
             withCredentials([string(credentialsId: 'telegram-bot-token', variable: 'TELEGRAM_BOT_TOKEN')]) {
                 script {
-                    def message = "❌ Terraform Deployment Failed\nPlease check the Jenkins logs for details."
+                    def message = "❌ Terraform Deployment Failed\nDeployment ID: ${deploymentId}\nPlease check the Jenkins logs for details."
                     sh """
                     curl -s -X POST "https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage" \
                          -d chat_id=${env.TELEGRAM_CHAT_ID} \
