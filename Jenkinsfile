@@ -8,7 +8,6 @@ pipeline {
         // Poll SCM every minute for changes (adjust the interval if necessary)
         pollSCM('H/1 * * * *')
     }
-    
     stages {
         stage('Checkout') {
             steps {
