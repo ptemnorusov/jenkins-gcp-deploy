@@ -6,7 +6,7 @@ pipeline {
     }
     triggers {
         // Poll SCM every minute for changes (adjust the interval if necessary)
-        pollSCM('*/3 * * * *')
+        pollSCM('*/1 * * * *')
     }
     stages {
         stage('Checkout') {
