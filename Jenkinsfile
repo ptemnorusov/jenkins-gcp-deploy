@@ -6,6 +6,7 @@ pipeline {
         TELEGRAM_BOT_TOKEN = credentials('telegram-bot-token') 
         TELEGRAM_CHAT_ID = credentials('tg-chat-id')
     }
+    
     triggers {
         // Poll SCM every minute for changes (adjust the interval if necessary)
         pollSCM('*/1 * * * *')
