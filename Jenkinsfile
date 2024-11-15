@@ -32,34 +32,51 @@ pipeline {
                 }
             }
         }
-    }
-    post 
-        {
-            success {
-                // Notify on success
+        stage('Extract Load Balancer URL') {
+            steps {
                 script {
                     // Capture Terraform Output
                     def tfOutput = sh(script: 'terraform output -json', returnStdout: true).trim()
 
-                    // Parse JSON using Groovy's JsonSlurper
-                    def jsonSlurper = new groovy.json.JsonSlurper()
-                    def outputJson = jsonSlurper.parseText(tfOutput)
+                    // Parse JSON and store in a simple map
+                    def loadBalancerUrl = new groovy.json.JsonSlurper().parseText(tfOutput).load_balancer_url.value ?: "No URL Found"
 
-                    // Extract the load balancer URL
-                    def loadBalancerUrl = outputJson?.load_balancer_url?.value ?: "No URL Found"
-
-                    // Send the URL to Telegram
-                    def message = "✅ Terraform Deployment Successful\nLoad Balancer URL: ${loadBalancerUrl}"
-                    sendTelegramNotification(message)
+                    // Store the value in a serializable variable
+                    currentBuild.description = "Load Balancer URL: ${loadBalancerUrl}"
+                    env.LOAD_BALANCER_URL = loadBalancerUrl
                 }
             }
-            failure {
-                // Notify on failure
+        }
+    }
+    post {
+        success {
+            // Notify on success
+            withCredentials([string(credentialsId: 'telegram-bot-token', variable: 'TELEGRAM_BOT_TOKEN')]) {
                 script {
-                    def message = "❌ *Terraform Deployment Failed*\nJob: ${env.JOB_NAME}\nBuild: #${env.BUILD_NUMBER}"
-                    sendTelegramNotification(message)
+                    def message = "✅ Terraform Deployment Successful\nLoad Balancer URL: ${env.LOAD_BALANCER_URL}"
+                    sh """
+                    curl -s -X POST "https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage" \
+                         -d chat_id=${env.TELEGRAM_CHAT_ID} \
+                         -d text="${message}" \
+                         -d parse_mode=Markdown
+                    """
                 }
             }
+        }
+        failure {
+            // Notify on failure
+            withCredentials([string(credentialsId: 'telegram-bot-token', variable: 'TELEGRAM_BOT_TOKEN')]) {
+                script {
+                    def message = "❌ Terraform Deployment Failed\nPlease check the Jenkins logs for details."
+                    sh """
+                    curl -s -X POST "https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage" \
+                         -d chat_id=${env.TELEGRAM_CHAT_ID} \
+                         -d text="${message}" \
+                         -d parse_mode=Markdown
+                    """
+                }
+            }
+        }
     //     always {
     //         // There could be an artiface saver
     //         archiveArtifacts artifacts: 'terraform.tfstate*'
