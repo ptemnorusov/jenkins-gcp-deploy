@@ -3,6 +3,8 @@ pipeline {
     environment {
         PROJECT_ID = 'prefab-faculty-350219' // Set your Google Cloud project ID
         REGION = 'us-central1' // Set your desired region
+        TELEGRAM_BOT_TOKEN = credentials('telegram-bot-token') 
+        TELEGRAM_CHAT_ID = credentials('tg-chat-id')
     }
     triggers {
         // Poll SCM every minute for changes (adjust the interval if necessary)
@@ -30,11 +32,36 @@ pipeline {
             }
         }
     }
-    // post {
+    post 
+        {
+            success {
+                // Notify on success
+                script {
+                    def message = "✅ *Terraform Deployment Success*\nJob: ${env.JOB_NAME}\nBuild: #${env.BUILD_NUMBER}"
+                    sendTelegramNotification(message)
+                }
+            }
+            failure {
+                // Notify on failure
+                script {
+                    def message = "❌ *Terraform Deployment Failed*\nJob: ${env.JOB_NAME}\nBuild: #${env.BUILD_NUMBER}"
+                    sendTelegramNotification(message)
+                }
+            }
     //     always {
     //         // There could be an artiface saver
     //         archiveArtifacts artifacts: 'terraform.tfstate*'
     //         cleanWs() // Clean up other workspace files
     //     }
     // }
+}
+
+// Function to send a Telegram notification
+def sendTelegramNotification(message) {
+    sh """
+    curl -s -X POST "https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage" \
+         -d chat_id=${env.TELEGRAM_CHAT_ID} \
+         -d text="${message}" \
+         -d parse_mode=Markdown
+    """
 }
