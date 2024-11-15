@@ -55,7 +55,7 @@ pipeline {
     //     }
     // }
 }
-
+}
 // Function to send a Telegram notification
 def sendTelegramNotification(message) {
     sh """
