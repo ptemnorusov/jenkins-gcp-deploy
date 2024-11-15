@@ -37,7 +37,15 @@ pipeline {
             success {
                 // Notify on success
                 script {
-                    def message = "✅ *Terraform Deployment Success*\nJob: ${env.JOB_NAME}\nBuild: #${env.BUILD_NUMBER}"
+                    // Capture Terraform Output
+                    def tfOutput = sh(script: 'terraform output -json', returnStdout: true).trim()
+
+                    // Parse the JSON Output
+                    def outputJson = readJSON text: tfOutput
+                    def loadBalancerUrl = outputJson?.load_balancer_url?.value ?: "No URL Found"
+
+                    // Send the URL to Telegram
+                    def message = "✅ Terraform Deployment Successful\nLoad Balancer URL: ${loadBalancerUrl}"
                     sendTelegramNotification(message)
                 }
             }
