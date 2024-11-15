@@ -40,8 +40,11 @@ pipeline {
                     // Capture Terraform Output
                     def tfOutput = sh(script: 'terraform output -json', returnStdout: true).trim()
 
-                    // Parse the JSON Output
-                    def outputJson = readJSON text: tfOutput
+                    // Parse JSON using Groovy's JsonSlurper
+                    def jsonSlurper = new groovy.json.JsonSlurper()
+                    def outputJson = jsonSlurper.parseText(tfOutput)
+
+                    // Extract the load balancer URL
                     def loadBalancerUrl = outputJson?.load_balancer_url?.value ?: "No URL Found"
 
                     // Send the URL to Telegram
