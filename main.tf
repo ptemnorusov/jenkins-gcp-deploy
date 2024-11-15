@@ -4,6 +4,8 @@ provider "google" {
   region  = var.region
 }
 
+# terraform state could be saved remotely on S3 for security and convenience.
+
 # Define Google Cloud Storage Bucket for hosting static content
 resource "google_storage_bucket" "static_site_bucket" {
   name     = "my-static-site-bucket-${var.project_id}"
