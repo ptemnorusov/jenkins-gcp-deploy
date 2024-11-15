@@ -1,3 +1,3 @@
 # terraform.tfvars
-project_id = "alert-flames-441714-e3"
+project_id = "prefab-faculty-350219"
 region     = "us-central1"
