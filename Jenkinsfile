@@ -30,11 +30,11 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-            // Archive state files to preserve them for future builds
-            archiveArtifacts artifacts: 'terraform.tfstate*'
-            cleanWs() // Clean up other workspace files
-        }
-    }
+    // post {
+    //     always {
+    //         // Archive state files to preserve them for future builds
+    //         archiveArtifacts artifacts: 'terraform.tfstate*'
+    //         cleanWs() // Clean up other workspace files
+    //     }
+    // }
 }
