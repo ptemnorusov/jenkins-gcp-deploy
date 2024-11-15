@@ -32,7 +32,7 @@ pipeline {
     }
     // post {
     //     always {
-    //         // Archive state files to preserve them for future builds
+    //         // There could be an artiface saver
     //         archiveArtifacts artifacts: 'terraform.tfstate*'
     //         cleanWs() // Clean up other workspace files
     //     }
